@@ -1,5 +1,4 @@
 #include <iostream>
-#include <algorithm>
 #include <string>
 #include <vector>
 #include <map>
@@ -16,7 +15,8 @@ int main() {
 	map<string, int> medal_table;
 
 	int num, gold, silver, bronze;
-	int result = 0;
+	int result = 1;
+	bool cal = false;
 	string temp;
 
 	for (int i = 0; i < N; i++) 
@@ -26,11 +26,12 @@ int main() {
 		medal_table[s]++;
 		if (num == K) { temp = s; }
 	}
-	//sort(medal_table.begin(), medal_table.end());
+
 	for (auto element : medal_table) 
 	{
-		result++;
-		if (element.first == temp) { break; }
+		if (cal) { result += element.second; }
+		if (element.first == temp) { cal = true; }
 	}
-	cout << medal_table.size() - result + 1 << endl;
+
+	cout << result<< endl;
 }
