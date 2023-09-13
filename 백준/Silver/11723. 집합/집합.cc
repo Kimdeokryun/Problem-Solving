@@ -44,7 +44,7 @@ int main() {
 		else if (command == "check")
 		{
 			cin >> num;
-			// endl로 하면 시간초과가 난다. cout.tie(0) 을 없애주고  "\n"을 사용하자
+			// endl로 하면 시간초과가 난다. cout.tie(0) 을 없애주고  "\n"을 사용하자.
 			if (bit & (1 << num)) { cout << "1\n"; }
 			else { cout << "0\n"; }
 		}
