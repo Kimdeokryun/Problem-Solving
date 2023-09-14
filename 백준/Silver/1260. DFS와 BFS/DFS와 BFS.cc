@@ -34,10 +34,15 @@ void bfs(int x)
 
 void dfs(int start) 
 {
+	// 방문한 정점이라면 return
 	if (visited[start]) { return; }
+
+	// 방문 표시
 	visited[start] = 1;
+	// 출력
 	cout << start << " ";
-	
+
+	// 다음 정점 탐색 및 재귀
 	for (int i = 0; i < graph[start].size(); i++) {
 		int y = graph[start][i];
 		dfs(y);
@@ -60,12 +65,14 @@ int main() {
 		graph[x].push_back(y);
 		graph[y].push_back(x);
 	}
-
+	// 정점이 작은 것 부터 방문해야하므로 정렬
 	for (int i = 0; i < 1001; i++) { sort(graph[i].begin(), graph[i].end()); }
-
+	// dfs 먼저 수행
 	dfs(V);
 	cout << endl;
+	// visited 초기화
 	memset(visited, 0, 1001* sizeof(bool));
+	// bfs 수행
 	bfs(V);
 	
 	return 0;
