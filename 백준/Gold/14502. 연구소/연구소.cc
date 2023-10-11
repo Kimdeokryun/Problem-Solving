@@ -6,6 +6,8 @@ using namespace std;
 
 int n, m;
 vector<vector<int>> map(8, vector<int>(8));
+vector<vector<int>> temp;
+
 vector<pair<int, int>> virus;
 
 int max_result;
@@ -16,7 +18,7 @@ int dy[] = { 0,0, -1, 1 };
 
 void spreadvirus(int x, int y)	// 바이러스 퍼짐
 {
-	map[x][y] = 2;
+	temp[x][y] = 2;
 
 	for (int dir = 0; dir < 4; dir++)
 	{
@@ -26,7 +28,7 @@ void spreadvirus(int x, int y)	// 바이러스 퍼짐
 		if (nx < 0 || nx >= n || ny < 0 || ny >= m)
 			continue;
 
-		if (map[nx][ny] != 0)
+		if (temp[nx][ny] != 0)
 			continue;
 
 		spreadvirus(nx, ny);
@@ -34,21 +36,14 @@ void spreadvirus(int x, int y)	// 바이러스 퍼짐
 }
 
 
-
 void solve() 
 {
-	vector<vector<int>> temp = map;		// 현재 map 복사
+	temp = map;		// 현재 map 복사
 	int virus_len = virus.size();
-
-	int x;
-	int y;
 
 	for (int i = 0; i < virus_len; i++)	// 현재 바이러스 위치.
 	{
-		x = virus[i].first;
-		y = virus[i].second;
-
-		spreadvirus(x, y);		// dfs 바이러스 퍼짐
+		spreadvirus(virus[i].first, virus[i].second);		// dfs 바이러스 퍼짐
 	}
 
 	int result = 0;
@@ -57,7 +52,7 @@ void solve()
 	{
 		for (int j = 0; j < m; j++)
 		{
-			if (map[i][j] == 0) // 바이러스 위치
+			if (temp[i][j] == 0) // 바이러스 위치
 			{
 				result++;
 			}
@@ -65,7 +60,6 @@ void solve()
 	}
 
 	if (max_result < result) { max_result = result; }  // 안전 영역 최대 값.
-	map = temp;	// map 되돌림.
 }
 
 int main() 
