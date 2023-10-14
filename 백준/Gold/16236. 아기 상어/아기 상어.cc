@@ -1,90 +1,119 @@
-#include <iostream>
-#include <queue>
-
+#include<iostream>
+#include<vector>
+#include<queue>
+#include<string.h>
 using namespace std;
+
 int n;
-int map[22][22];
-int dx[] = { 0, -1, 1, 0 }; // 상좌우하
-int dy[] = { -1, 0, 0, 1 };
-int bx, by;
-int result = 0; // 총 걸린 시간
+vector<vector<int>> map(21, vector<int>(21));
+bool visit[21][21];
 
-bool stop = false; // 먹을 물고기가 없는 경우
-bool eat = false; // 한 마리를 먹은 경우
+bool eat;
+int shark_x, shark_y;
+int shark_size;
+int eat_count;
+int time_result;
 
-void bfs(int a, int b, bool visit[][22], int shSize) {
-    queue<pair<pair<int, int>, int>> q;
-    q.push(make_pair(make_pair(a, b), 0));
-    visit[b][a] = true;
-    int temp; // 한 마리를 먹는데 걸린 시간
-    while (!q.empty()) {
-        int x = q.front().first.first; // 열 좌표
-        int y = q.front().first.second; // 행 좌표
-        int cnt = q.front().second; // 현재 시간
-        // 가장 위쪽을 먼저 그 다음 왼쪽을 우선적으로 먹는 것을 고려
-        if (map[y][x] > 0 && map[y][x] < shSize && temp == cnt) {
-            if ((by > y) || (by == y && bx > x)) {
-                by = y; // 물고기를 먹은 상어 위치 저장
-                bx = x;
-                continue;
-            }
-        }
-        q.pop();
-        for (int i = 0; i < 4; i++) {
-            int nx = x + dx[i]; // 방향 이동
-            int ny = y + dy[i];
+//상 좌 하 우   순으로
+int dx[] = { -1, 0, 1, 0 };
+int dy[] = { 0, -1, 0, 1 };
 
-            if (nx >= 0 && nx < n && ny >= 0 && ny < n && !visit[ny][nx]) {
-                if (map[ny][nx] <= shSize) {// 지나가거나 먹을 수 있는 경우
-                    if (map[ny][nx] > 0 && map[ny][nx] < shSize && !eat) { //물고기를 먹을 수 있는 경우
-                        eat = true; // 한 마리 먹음
-                        bx = nx; //시작 위치를 물고기를 먹었던 위치로
-                        by = ny;
-                        temp = cnt + 1; // 한 마리 먹는데걸린 시간
-                        result += temp; // 총 시간에 추가
-                    }
-                    else { // 물고기를 못먹는 경우
-                        q.push(make_pair(make_pair(nx, ny), cnt + 1));
-                        visit[ny][nx] = true;
-                    }
-                }
-            }
-        }
-    }
+void bfs();
+
+int main() 
+{
+	cin >> n;
+
+	for (int i = 0; i < n; i++) 
+	{
+		for (int j = 0; j < n; j++)
+		{
+			cin >> map[i][j];
+			if (map[i][j] == 9)		// 아기 상어 위치
+			{
+				map[i][j] = 0;
+				shark_x = i;
+				shark_y = j;
+			}
+		}
+	}
+
+	bool stop = false;		// 값 초기화
+	eat_count = 0;
+	shark_size = 2;
+	time_result = 0;
+
+	while (!stop) 
+	{
+		memset(visit, false, sizeof(visit));
+
+		bfs();
+
+		if (eat) 
+		{
+			eat = false;
+			eat_count+=1;
+			map[shark_x][shark_y] = 0;	// 먹은 물고기 삭제
+			if (eat_count == shark_size) { shark_size += 1; eat_count = 0; }
+		}
+		else 
+		{
+			stop = true;
+		}
+	}
+
+	cout << time_result << "\n";
+	return 0;
+
 }
 
-int main() {
-    cin >> n;
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            cin >> map[i][j];
-            if (map[i][j] == 9) {
-                by = i; // 상어 시작 위치
-                bx = j;
-                map[i][j] = 0;
-            }
-        }
-    }
+void bfs() 
+{
+	queue <pair<pair<int, int>, int>> q;	// first.first = x좌표, first.second = y좌표,  second는 시간좌표.
+	q.push(make_pair(make_pair(shark_x, shark_y), 0));
+	
+	visit[shark_x][shark_y] = true;
 
-    int count = 0; // 물고기 먹은 횟수
-    int sz = 2; // 상어 사이즈
+	int temp_time;
+	while (!q.empty()) 
+	{
+		int x = q.front().first.first;
+		int y = q.front().first.second;
+		int time = q.front().second;
+	
+		// 가장 위쪽을 먼저 그 다음 왼쪽을 우선적으로 먹는 것을 고려
+		if (map[x][y] > 0 && map[x][y] < shark_size && temp_time == time) {
+			if ((shark_x > x) || (shark_x == x && shark_y > y)) {		//위 고려 ||  좌측 고려
+				shark_x = x; // 물고기를 먹은 상어 위치 저장
+				shark_y = y;
+				continue;		// 먹기 전 상어 이동부터.
+			}
+		}
+		q.pop();	// 이전 위치 변경.
 
-    while (!stop) {
-        bool visit[22][22] = { 0 };
-        bfs(bx, by, visit, sz); // 한 마리 먹을때까지 이동
-        if (eat) { // 먹었을 경우
-            eat = false;
-            count += 1; // 현재 크기에서 물고기 먹은 횟수 증가
-            map[by][bx] = 0; // 먹은 물고기 삭제
-            if (count == sz) { // 상어 크기가 증가하는 경우
-                sz += 1; // 상어 사이즈 +1
-                count = 0; //현재 크기에서 물고기 먹은 횟수 초기화
-            }
-        }
-        else { // 한 마리도 못먹는 경우
-            stop = true; // 엄마 상어에게 도움 요청해야함.
-        }
-    }
-    cout << result << '\n';
-    return 0;
+		for (int dir = 0; dir < 4; dir++) 
+		{
+			int nx = x + dx[dir];
+			int ny = y + dy[dir];
+
+			if (nx < 0 || ny < 0 || nx >= n || ny >= n || visit[nx][ny]) // out of range or visited
+			{
+				continue;
+			}
+			if (map[nx][ny] <= shark_size) // 지나가거나 먹을 수 있는 경우
+			{
+				if (map[nx][ny] > 0 && map[nx][ny] < shark_size && !eat) { //물고기를 먹을 수 있는 경우
+					eat = true; // 한 마리 먹음
+					shark_x = nx; // 먹을 물고기 위치로
+					shark_y = ny;
+					temp_time = time + 1; // 한 마리 먹는데 걸린 시간
+					time_result += temp_time; // 총 시간에 추가
+				}
+				else { // 물고기를 못먹는 경우 이동만 (0이거나 상어와 같은 사이즈의 물고기)  (한 칸 이동마다 time이 1 증가)
+					q.push(make_pair(make_pair(nx, ny), time + 1));
+					visit[nx][ny] = true;
+				}
+			}
+		}
+	}
 }
