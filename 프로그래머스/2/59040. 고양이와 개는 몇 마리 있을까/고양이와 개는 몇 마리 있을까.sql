@@ -1,0 +1,2 @@
+-- 코드를 입력하세요
+SELECT ANIMAL_TYPE, count(ANIMAL_ID) as count from ANIMAL_INS group by ANIMAL_TYPE ORDER BY CASE WHEN ANIMAL_TYPE = 'Cat' THEN 1 ELSE 2 END;;
