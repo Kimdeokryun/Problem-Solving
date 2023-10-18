@@ -1,0 +1,2 @@
+-- 코드를 입력하세요
+SELECT year(OS.SALES_DATE) as YEAR, month(OS.SALES_DATE) as MONTH, GENDER, count(DISTINCT OS.USER_ID) as USERS from USER_INFO UI join ONLINE_SALE OS on UI.USER_ID = OS.USER_ID where GENDER is not null group by YEAR, MONTH, GENDER order by YEAR asc, MONTH asc, GENDER asc;
